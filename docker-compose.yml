@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./is-works-backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - AUTH_MODE=jwt
+      - JWT_ACCESS_SECRET=your_access_secret_change_in_production
+      - JWT_REFRESH_SECRET=your_refresh_secret_change_in_production
+      - STATIC_USER_EMAIL=admin@example.com
+      - STATIC_USER_PASSWORD=admin123
+      - CORS_ORIGIN=http://localhost:5173
+    volumes:
+      - ./is-works-backend/logs:/app/logs
+    networks:
+      - is-works-network
+
+  frontend:
+    build:
+      context: ./is-works-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000
+    depends_on:
+      - backend
+    networks:
+      - is-works-network
+
+networks:
+  is-works-network:
+    driver: bridge
